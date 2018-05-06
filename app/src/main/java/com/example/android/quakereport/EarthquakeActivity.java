@@ -15,8 +15,12 @@
  */
 package com.example.android.quakereport;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -31,25 +35,39 @@ public class EarthquakeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
+        /*
         // Create a fake list of earthquake locations.
-        ArrayList<String> earthquakes = new ArrayList<>();
-        earthquakes.add("San Francisco");
-        earthquakes.add("London");
-        earthquakes.add("Tokyo");
-        earthquakes.add("Mexico City");
-        earthquakes.add("Moscow");
-        earthquakes.add("Rio de Janeiro");
-        earthquakes.add("Paris");
-
+        ArrayList<QuakeReportDesign> earthquakes = new ArrayList<>();
+        earthquakes.add(new QuakeReportDesign(7.2, "San Francisco", "Feb 2, 2016"));
+        earthquakes.add(new QuakeReportDesign(6.1,"London", "July 28, 2015"));
+        earthquakes.add(new QuakeReportDesign(3.9, "Tokyo", "Nov 10, 2014"));
+        earthquakes.add(new QuakeReportDesign(5.4, "Mexico City", "May 3, 2014"));
+        earthquakes.add(new QuakeReportDesign(2.8, "Moscow", "Jan 31, 2013"));
+        earthquakes.add(new QuakeReportDesign(4.9, "Rio de Janeiro", "Aug 19, 2012"));
+        earthquakes.add(new QuakeReportDesign(1.6, "Paris", "Oct 30, 2011"));
+        */
         // Find a reference to the {@link ListView} in the layout
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
+        // Create a fake list of earthquakes.
+        ArrayList<QuakeReportDesign> earthquakes = QueryUtils.extractEarthquakes();
 
-        // Create a new {@link ArrayAdapter} of earthquakes
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_list_item_1, earthquakes);
+        //QuakeReport Custom Adapter
+        final QuakeReportAdapter adapter = new QuakeReportAdapter(this, earthquakes);
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
         earthquakeListView.setAdapter(adapter);
+        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                QuakeReportDesign currentQuake = adapter.getItem(i);
+
+                Uri earthquakeUri = Uri.parse(currentQuake.getUrl());
+
+                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
+
+                startActivity(websiteIntent);
+            }
+        });
     }
 }
